@@ -7,7 +7,7 @@ main = Blueprint('main', __name__)
 
 # user sign up route
 @main.route('/signup', methods=['GET', 'POST'])
-def register():
+def signup():
     form = SignupForm()
     if form.validate_on_submit():  # if the form was successfully submitted
         # Create new user object
@@ -19,7 +19,7 @@ def register():
         db.session.commit()
         flash('Account successfully created!', 'success')
         return redirect(url_for('main.login'))
-    return render_template('register.html', form=form)
+    return render_template('signup.html', form=form)
 
 # user login route
 @main.route('/login', methods=['GET', 'POST'])
@@ -48,3 +48,10 @@ def logout():
 def dashboard():
     jobs = current_user.jobs
     return render_template('dashboard.html', jobs=jobs)
+
+@main.route('/')
+def home():
+    # If logged in, go to dashboard, else go to login page
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+    return redirect(url_for('main.login'))
