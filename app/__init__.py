@@ -14,3 +14,11 @@ def create_app():
 
     from .routes import main
     app.register_blueprint(main)
+
+
+from .models import User
+
+@login_manager.user_loader
+def load_user(user_id):
+    # This function reloads the user object from the user ID stored in session
+    return User.query.get(int(user_id))
