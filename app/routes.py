@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from .forms import SignupForm, LoginForm
 from .models import User, db
 from flask_login import login_user, logout_user, login_required, current_user
@@ -9,31 +11,39 @@ main = Blueprint('main', __name__)
 @main.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
-    if form.validate_on_submit():  # if the form was successfully submitted
-        # Create new user object
-        user = User(username=form.username.data, email=form.email.data)
-        # Hash and store the password
-        user.set_password(form.password.data)
-        # Save new user to database
+    if form.validate_on_submit():
+        # Check if user with this email already exists
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash('Email already registered. Please login or use a different email.', 'danger')
+            return redirect(url_for('main.signup'))
+
+        # Hash password
+        hashed_password = generate_password_hash(form.password.data)
+
+        # Create new user
+        user = User(username=form.username.data,
+                    email=form.email.data,
+                    password_hash=hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash('Account successfully created!', 'success')
+        flash('Your account has been created! You can now log in.', 'success')
         return redirect(url_for('main.login'))
     return render_template('signup.html', form=form)
-
 # user login route
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        # Look for the user in the database
         user = User.query.filter_by(email=form.email.data).first()
-        # If user exists and password is correct
-        if user and user.check_password(form.password.data):
-            login_user(user)  # log them in
-            return redirect(url_for('main.dashboard'))
-        flash('Invalid email or password.', 'danger')
+        if user and check_password_hash(user.password_hash, form.password.data):
+            login_user(user)  # Flask-Login
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('main.dashboard'))  # or wherever
+        else:
+            flash('Login failed. Check email and password.', 'danger')
     return render_template('login.html', form=form)
+
 
 # user logout route
 @main.route('/logout')

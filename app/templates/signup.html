@@ -2,18 +2,12 @@
 
 {% block content %}
   <h2>Signup</h2>
-  <form method="POST">
+ <form method="POST" action="{{ url_for('main.signup') }}">
     {{ form.hidden_tag() }}
-
-    {{ form.email.label }}<br>
-    {{ form.email(size=32) }}<br><br>
-
-    {{ form.password.label }}<br>
-    {{ form.password(size=32) }}<br><br>
-
-    {{ form.confirm_password.label }}<br>
-    {{ form.confirm_password(size=32) }}<br><br>
-
+    {{ form.username.label }} {{ form.username() }}<br>
+    {{ form.email.label }} {{ form.email() }}<br>
+    {{ form.password.label }} {{ form.password() }}<br>
+    {{ form.confirm_password.label }} {{ form.confirm_password() }}<br>
     {{ form.submit() }}
-  </form>
+</form>
 {% endblock %}
