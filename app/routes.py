@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .forms import SignupForm, LoginForm
-from .models import User, db
+from .forms import SignupForm, LoginForm, JobForm
+from .models import User, db, Job
 from flask_login import login_user, logout_user, login_required, current_user
 
 main = Blueprint('main', __name__)
@@ -56,8 +56,56 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    jobs = current_user.jobs
+    jobs = Job.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', jobs=jobs)
+
+@main.route("/job/new", methods=['GET', 'POST'])
+@login_required
+def new_job():
+    form = JobForm()
+    if form.validate_on_submit():
+        job = Job(title=form.title.data,
+                  company=form.company.data,
+                  status=form.status.data,
+                  notes=form.notes.data,
+                  owner=current_user)
+        db.session.add(job)
+        db.session.commit()
+        flash("Job added successfully!", "success")
+        return redirect(url_for("dashboard"))
+    return render_template("job_form.html", form=form)
+
+@main.route("/job/<int:job_id>/edit", methods=['GET', 'POST'])
+@login_required
+def edit_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    if job.owner != current_user:
+        flash("You do not have permission to edit this job.", "danger")
+        return redirect(url_for("dashboard"))
+
+    form = JobForm(obj=job)
+    if form.validate_on_submit():
+        job.title = form.title.data
+        job.company = form.company.data
+        job.status = form.status.data
+        job.notes = form.notes.data
+        db.session.commit()
+        flash("Job updated!", "success")
+        return redirect(url_for("dashboard"))
+    return render_template("job_form.html", form=form)
+
+@main.route("/job/<int:job_id>/delete", methods=['POST'])
+@login_required
+def delete_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    if job.owner != current_user:
+        flash("You do not have permission to delete this job.", "danger")
+        return redirect(url_for("dashboard"))
+
+    db.session.delete(job)
+    db.session.commit()
+    flash("Job deleted!", "success")
+    return redirect(url_for("dashboard"))
 
 @main.route('/')
 def home():
