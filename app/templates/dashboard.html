@@ -2,5 +2,28 @@
 
 {% block content %}
   <h2>Dashboard</h2>
-  <p>Welcome, {{ current_user.email }}!</p>
+  <a href="{{ url_for('main.new_job') }}">Add New Job</a>
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Company</th>
+      <th>Status</th>
+      <th>Notes</th>
+      <th>Actions</th>
+    </tr>
+    {% for job in jobs %}
+    <tr>
+      <td>{{ job.title }}</td>
+      <td>{{ job.company }}</td>
+      <td>{{ job.status }}</td>
+      <td>{{ job.notes }}</td>
+      <td>
+        <a href="{{ url_for('main.edit_job', job_id=job.id) }}">Edit</a>
+        <form action="{{ url_for('main.delete_job', job_id=job.id) }}" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
 {% endblock %}

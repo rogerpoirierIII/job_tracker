@@ -25,4 +25,5 @@ class Job(db.Model):
     title = db.Column(db.String(150), nullable=False)
     company = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(50), default='Applied')
+    notes = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
