@@ -1,5 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField
+from wtforms.fields.choices import SelectField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired,Email,EqualTo
 
 #Signup form for new users
@@ -18,3 +20,14 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+
+class JobForm(FlaskForm):
+    title = StringField('Job Title', validators=[DataRequired()])
+    company = StringField('Company', validators=[DataRequired()])
+    status = SelectField('Status', choices=[('Applied', 'Applied'),
+                                            ('Interview', 'Interview'),
+                                            ('Offer', 'Offer'),
+                                            ('Rejected', 'Rejected')])
+    notes = TextAreaField('Notes')
+    submit = SubmitField('Save')
