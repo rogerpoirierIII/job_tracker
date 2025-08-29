@@ -1,12 +1,36 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <h2>{{ form.title.label }}</h2>
-  <form method="POST">
-    {{ form.hidden_tag() }}
-    <p>{{ form.title.label }} {{ form.title() }}</p>
-    <p>{{ form.company.label }} {{ form.company() }}</p>
-    <p>{{ form.status.label }} {{ form.status() }}</p>
-    <p>{{ form.notes.label }} {{ form.notes() }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-4">{{ 'Edit Job' if form.title.data else 'New Job' }}</h2>
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.title.label(class="form-label") }}
+          {{ form.title(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.company.label(class="form-label") }}
+          {{ form.company(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.status.label(class="form-label") }}
+          {{ form.status(class="form-select") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.notes.label(class="form-label") }}
+          {{ form.notes(class="form-control", rows="3") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
