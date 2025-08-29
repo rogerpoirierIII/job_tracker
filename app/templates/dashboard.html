@@ -1,45 +1,63 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <h2>Dashboard</h2>
-  <a href="{{ url_for('main.new_job') }}">Add New Job</a>
-<form method="get" action="{{ url_for('main.dashboard') }}" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-  <label for="status">Filter by Status:</label>
-  <select name="status" id="status">
-    <option value="">All</option>
-    <option value="Applied" {% if status_filter=='Applied' %}selected{% endif %}>Applied</option>
-    <option value="Interview" {% if status_filter=='Interview' %}selected{% endif %}>Interview</option>
-    <option value="Offer" {% if status_filter=='Offer' %}selected{% endif %}>Offer</option>
-    <option value="Rejected" {% if status_filter=='Rejected' %}selected{% endif %}>Rejected</option>
-  </select>
+<div class="container mt-4">
+    <h2 class="mb-4">My Job Applications</h2>
 
-  <button type="submit">Apply Filter</button>
-  <a href="{{ url_for('main.dashboard') }}"><button type="button">Clear Filter</button></a>
-</form>
+    <!-- Filter -->
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="Applied" {% if status_filter == 'Applied' %}selected{% endif %}>Applied</option>
+                <option value="Interview" {% if status_filter == 'Interview' %}selected{% endif %}>Interview</option>
+                <option value="Offer" {% if status_filter == 'Offer' %}selected{% endif %}>Offer</option>
+                <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+            <button class="btn btn-primary" type="submit">Filter</button>
+            {% if status_filter %}
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </div>
+    </form>
 
+    <!-- Job List -->
+    <div class="row">
+        {% for job in jobs %}
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ job.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
 
+                    <!-- Status badge -->
+                    <p>
+                        {% if job.status == "Applied" %}
+                            <span class="badge bg-primary">Applied</span>
+                        {% elif job.status == "Interview" %}
+                            <span class="badge bg-warning text-dark">Interview</span>
+                        {% elif job.status == "Offer" %}
+                            <span class="badge bg-success">Offer</span>
+                        {% elif job.status == "Rejected" %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ job.status }}</span>
+                        {% endif %}
+                    </p>
 
-<table>
-    <tr>
-      <th>Title</th>
-      <th>Company</th>
-      <th>Status</th>
-      <th>Notes</th>
-      <th>Actions</th>
-    </tr>
-    {% for job in jobs %}
-    <tr>
-      <td>{{ job.title }}</td>
-      <td>{{ job.company }}</td>
-      <td>{{ job.status }}</td>
-      <td>{{ job.notes }}</td>
-      <td>
-        <a href="{{ url_for('main.edit_job', job_id=job.id) }}">Edit</a>
-        <form action="{{ url_for('main.delete_job', job_id=job.id) }}" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+                    {% if job.notes %}
+                        <p class="card-text"><strong>Notes:</strong> {{ job.notes }}</p>
+                    {% endif %}
+
+                    <a href="{{ url_for('main.edit_job', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <form method="POST" action="{{ url_for('main.delete_job', job_id=job.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>No jobs added yet.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
