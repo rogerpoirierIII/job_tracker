@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import unique
 
 from sqlalchemy import false
@@ -27,3 +28,5 @@ class Job(db.Model):
     status = db.Column(db.String(50), default='Applied')
     notes = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.utcnow)
