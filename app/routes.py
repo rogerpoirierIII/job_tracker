@@ -57,27 +57,43 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    status_filter = request.args.get('status') # ex: ?status=Applied
-    sort_option = request.args.get('sort') # Newest, Oldest, Company (A-Z), and Status
+    status_filter = request.args.get('status')   # e.g. ?status=Applied
+    sort_option = request.args.get('sort')       # newest, oldest, company, status
+    search_query = request.args.get('search')    # search term
 
+    # Start with jobs owned by current user
     query = Job.query.filter_by(user_id=current_user.id)
 
+    # Apply search
+    if search_query:
+        query = query.filter(
+            (Job.title.ilike(f"%{search_query}%")) |
+            (Job.company.ilike(f"%{search_query}%"))
+        )
+
+    # Apply status filter
     if status_filter:
-        query = query.filter_by(status = status_filter)
+        query = query.filter_by(status=status_filter)
 
-        if sort_option == "newest":
-            query = query.order_by(Job.created_at.desc())
-        elif sort_option == "oldest":
-            query = query.order_by(Job.created_at.asc())
-        elif sort_option == "company":
-            query = query.order_by(Job.company.asc())
-        elif sort_option == "status":
-            query = query.order_by(Job.status.asc())
+    # Apply sorting
+    if sort_option == "oldest":
+        query = query.order_by(Job.created_at.asc())
+    elif sort_option == "company":
+        query = query.order_by(Job.company.asc())
+    elif sort_option == "status":
+        query = query.order_by(Job.status.asc())
+    else:  # default to newest
+        query = query.order_by(Job.created_at.desc())
 
-        jobs = query.all()
-    else:
-        jobs = Job.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', jobs=jobs, status_filter=status_filter)
+    jobs = query.all()
+
+    return render_template(
+        'dashboard.html',
+        jobs=jobs,
+        status_filter=status_filter,
+        sort_option=sort_option,
+        search_query=search_query
+    )
 
 @main.route("/job/new", methods=['GET', 'POST'])
 @login_required
