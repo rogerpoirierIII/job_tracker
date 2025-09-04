@@ -5,22 +5,42 @@
     <h2 class="mb-4">My Applications</h2>
     <a href="{{ url_for('main.new_job') }}" class="btn btn-primary">+ New Application</a>
     </div>
-    <!-- Filter -->
-    <form method="get" class="mb-3">
-        <div class="input-group">
-            <select name="status" class="form-select">
-                <option value="">All Statuses</option>
-                <option value="Applied" {% if status_filter == 'Applied' %}selected{% endif %}>Applied</option>
-                <option value="Interview" {% if status_filter == 'Interview' %}selected{% endif %}>Interview</option>
-                <option value="Offer" {% if status_filter == 'Offer' %}selected{% endif %}>Offer</option>
-                <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
-            </select>
-            <button class="btn btn-primary" type="submit">Filter</button>
-            {% if status_filter %}
-            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Clear</a>
-            {% endif %}
-        </div>
-    </form>
+
+
+ <form method="GET" action="{{ url_for('main.dashboard') }}" class="row g-3 mb-4 align-items-end">
+
+<form method="GET" action="{{ url_for('main.dashboard') }}" class="row g-3 mb-4 align-items-end">
+
+  <!-- Status Filter -->
+  <div class="col-md-3">
+    <label for="status" class="form-label fw-bold">Filter by Status:</label>
+    <select class="form-select" name="status" id="status">
+      <option value="">All</option>
+      <option value="Applied" {% if request.args.get('status') == 'Applied' %}selected{% endif %}>Applied</option>
+      <option value="Interview" {% if request.args.get('status') == 'Interview' %}selected{% endif %}>Interview</option>
+      <option value="Offer" {% if request.args.get('status') == 'Offer' %}selected{% endif %}>Offer</option>
+      <option value="Rejected" {% if request.args.get('status') == 'Rejected' %}selected{% endif %}>Rejected</option>
+    </select>
+  </div>
+
+  <!-- Sort Dropdown -->
+  <div class="col-md-3">
+    <label for="sort" class="form-label fw-bold">Sort by:</label>
+    <select class="form-select" name="sort" id="sort">
+      <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Newest</option>
+      <option value="oldest" {% if request.args.get('sort') == 'oldest' %}selected{% endif %}>Oldest</option>
+      <option value="company" {% if request.args.get('sort') == 'company' %}selected{% endif %}>Company</option>
+      <option value="status" {% if request.args.get('sort') == 'status' %}selected{% endif %}>Status</option>
+    </select>
+  </div>
+
+  <!-- Buttons -->
+  <div class="col-md-auto d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Apply</button>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Clear</a>
+  </div>
+
+</form>
 
     <!-- Job List -->
     <div class="row">

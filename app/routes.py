@@ -58,8 +58,23 @@ def logout():
 @login_required
 def dashboard():
     status_filter = request.args.get('status') # ex: ?status=Applied
+    sort_option = request.args.get('sort') # Newest, Oldest, Company (A-Z), and Status
+
+    query = Job.query.filter_by(user_id=current_user.id)
+
     if status_filter:
-        jobs = Job.query.filter_by(user_id=current_user.id, status=status_filter).all()
+        query = query.filter_by(status = status_filter)
+
+        if sort_option == "newest":
+            query = query.order_by(Job.created_at.desc())
+        elif sort_option == "oldest":
+            query = query.order_by(Job.created_at.asc())
+        elif sort_option == "company":
+            query = query.order_by(Job.company.asc())
+        elif sort_option == "status":
+            query = query.order_by(Job.status.asc())
+
+        jobs = query.all()
     else:
         jobs = Job.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', jobs=jobs, status_filter=status_filter)
