@@ -134,6 +134,10 @@ def new_job():
         job = Job(title=form.title.data,
                   company=form.company.data,
                   status=form.status.data,
+                  website = form.website.data,
+                  location = form.location.data,
+                  contact = form.contact.data,
+                  salary = form.salary.data,
                   notes=form.notes.data,
                   owner=current_user)
         db.session.add(job)
@@ -155,6 +159,13 @@ def edit_job(job_id):
         job.title = form.title.data
         job.company = form.company.data
         job.status = form.status.data
+        website = form.website.data
+        if website and '://' not in website:
+            website = 'https://' + website
+        job.website = website
+        job.location = form.location.data
+        job.contact = form.contact.data
+        job.salary = form.salary.data
         job.notes = form.notes.data
         db.session.commit()
         flash("Job updated!", "success")

@@ -19,7 +19,6 @@
         <div class="card-body">
             <!-- Status -->
             <p>
-                <strong>Status:</strong>
                 {% if job.status == "Applied" %}
                     <span class="badge bg-primary">Applied</span>
                 {% elif job.status == "Interview" %}
@@ -32,12 +31,11 @@
                     <span class="badge bg-secondary">{{ job.status }}</span>
                 {% endif %}
             </p>
-
-            <!-- Notes -->
-            {% if job.notes %}
-                <p><strong>Notes:</strong> {{ job.notes }}</p>
-            {% endif %}
-
+            {% if job.website %}<p>Website: <a href="{{ job.website if '://' in job.website else 'https://' + job.website }}" target="_blank">{{ job.website }}</a></p>{% endif %}
+            {% if job.location %}<p>Location: {{ job.location }}</p>{% endif %}
+            {% if job.contact %}<p>Contact: {{ job.contact }}</p>{% endif %}
+            {% if job.salary %}<p>Salary: {{ job.salary }}</p>{% endif %}
+            {% if job.notes %}<p>Notes: {{ job.notes }}</p>{% endif %}
             <!-- Dates -->
             <p class="text-muted mb-0">
                 Created at: {{ job.created_at.strftime('%b %d, %Y %I:%M %p') }}<br>
