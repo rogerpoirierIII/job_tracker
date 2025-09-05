@@ -57,11 +57,47 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
+    status_filter = request.args.get('status')
+    sort_option = request.args.get('sort')
+    search_query = request.args.get('search')
+
+    query = Job.query.filter_by(user_id=current_user.id)
+
+    if search_query:
+        query = query.filter(
+            (Job.title.ilike(f"%{search_query}%")) |
+            (Job.company.ilike(f"%{search_query}%"))
+        )
+
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+
+    if sort_option == "oldest":
+        query = query.order_by(Job.created_at.asc())
+    elif sort_option == "company":
+        query = query.order_by(Job.company.asc())
+    elif sort_option == "status":
+        query = query.order_by(Job.status.asc())
+    else:
+        query = query.order_by(Job.created_at.desc())
+
+    jobs = query.all()
+
+    return render_template(
+        "dashboard.html",
+        jobs=jobs,
+        status_filter=status_filter,
+        sort_option=sort_option,
+        search_query=search_query
+    )
+# Search / filter / sort endpoint for AJAX
+@main.route('/search_jobs')
+@login_required
+def search_jobs():
     status_filter = request.args.get('status')   # e.g. ?status=Applied
     sort_option = request.args.get('sort')       # newest, oldest, company, status
     search_query = request.args.get('search')    # search term
 
-    # Start with jobs owned by current user
     query = Job.query.filter_by(user_id=current_user.id)
 
     # Apply search
@@ -82,18 +118,13 @@ def dashboard():
         query = query.order_by(Job.company.asc())
     elif sort_option == "status":
         query = query.order_by(Job.status.asc())
-    else:  # default to newest
+    else:  # default newest
         query = query.order_by(Job.created_at.desc())
 
     jobs = query.all()
 
-    return render_template(
-        'dashboard.html',
-        jobs=jobs,
-        status_filter=status_filter,
-        sort_option=sort_option,
-        search_query=search_query
-    )
+    # Render only the job cards
+    return render_template("job_cards.html", jobs=jobs)
 
 @main.route("/job/new", methods=['GET', 'POST'])
 @login_required

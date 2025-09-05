@@ -1,99 +1,123 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-4">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-4">My Applications</h2>
-    <a href="{{ url_for('main.new_job') }}" class="btn btn-primary">+ New Application</a>
+        <h2 class="mb-0">My Applications</h2>
+        <a href="{{ url_for('main.new_job') }}" class="btn btn-primary">+ New Application</a>
     </div>
 
-<form method="GET" action="{{ url_for('main.dashboard') }}" class="row g-3 mb-4 align-items-end">
-
-  <!-- Status Filter -->
-  <div class="col-md-3">
-    <label for="status" class="form-label fw-bold">Filter by Status</label>
-    <select class="form-select" name="status" id="status">
-      <option value="">All</option>
-      <option value="Applied" {% if status_filter == 'Applied' %}selected{% endif %}>Applied</option>
-      <option value="Interview" {% if status_filter == 'Interview' %}selected{% endif %}>Interview</option>
-      <option value="Offer" {% if status_filter == 'Offer' %}selected{% endif %}>Offer</option>
-      <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
-    </select>
-  </div>
-
-  <!-- Sort -->
-  <div class="col-md-3">
-    <label for="sort" class="form-label fw-bold">Sort by</label>
-    <select class="form-select" name="sort" id="sort">
-      <option value="newest" {% if sort_option == 'newest' %}selected{% endif %}>Newest</option>
-      <option value="oldest" {% if sort_option == 'oldest' %}selected{% endif %}>Oldest</option>
-      <option value="company" {% if sort_option == 'company' %}selected{% endif %}>Company</option>
-      <option value="status" {% if sort_option == 'status' %}selected{% endif %}>Status</option>
-    </select>
-  </div>
-
-  <!-- Search -->
-  <div class="col-md-4">
-    <label for="search" class="form-label fw-bold">Search</label>
-    <input type="text" class="form-control" name="search" id="search"
-           placeholder="Search jobs..." value="{{ search_query or '' }}">
-  </div>
-
-  <!-- Buttons -->
-  <div class="col-md-2 d-flex justify-content-start">
-    <button type="submit" class="btn btn-primary me-2">Apply</button>
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Clear</a>
-  </div>
-
-</form>
-
-    <!-- Job List -->
-    <div class="row">
-        {% for job in jobs %}
-        <div class="col-md-6 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ job.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
-
-                    <!-- Status badge -->
-                    <p>
-                        {% if job.status == "Applied" %}
-                            <span class="badge bg-primary">Applied</span>
-                        {% elif job.status == "Interview" %}
-                            <span class="badge bg-warning text-dark">Interview</span>
-                        {% elif job.status == "Offer" %}
-                            <span class="badge bg-success">Offer</span>
-                        {% elif job.status == "Rejected" %}
-                            <span class="badge bg-danger">Rejected</span>
-                        {% else %}
-                            <span class="badge bg-secondary">{{ job.status }}</span>
-                        {% endif %}
-                    </p>
-
-                    {% if job.notes %}
-                        <p class="card-text"><strong>Notes:</strong> {{ job.notes }}</p>
-                    {% endif %}
-<div class="card-footer d-flex justify-content-between align-items-center">
-  <small class="text-muted">
-    Last update: {{ job.updated_at.strftime('%b %d, %Y %I:%M %p') }}
-  </small>
-  <div>
-    <a href="{{ url_for('main.edit_job', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-    <form method="POST" action="{{ url_for('main.delete_job', job_id=job.id) }}" style="display:inline;">
-      <button type="submit" class="btn btn-sm btn-outline-danger"
-              onclick="return confirm('Are you sure you want to delete this job?');">
-        Delete
-      </button>
-    </form>
-  </div>
-</div>
-
-                </div>
-            </div>
+    <!-- Filters and Search -->
+    <form id="filter-form" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="status" class="form-label fw-bold">Filter by Status</label>
+            <select class="form-select" name="status" id="status">
+                <option value="">All</option>
+                <option value="Applied" {% if status_filter == 'Applied' %}selected{% endif %}>Applied</option>
+                <option value="Interview" {% if status_filter == 'Interview' %}selected{% endif %}>Interview</option>
+                <option value="Offer" {% if status_filter == 'Offer' %}selected{% endif %}>Offer</option>
+                <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+            </select>
         </div>
-        {% else %}
-        <p>No jobs added yet.</p>
-        {% endfor %}
+
+        <div class="col-md-3">
+            <label for="sort" class="form-label fw-bold">Sort by</label>
+            <select class="form-select" name="sort" id="sort">
+                <option value="newest" {% if sort_option == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="oldest" {% if sort_option == 'oldest' %}selected{% endif %}>Oldest</option>
+                <option value="company" {% if sort_option == 'company' %}selected{% endif %}>Company</option>
+                <option value="status" {% if sort_option == 'status' %}selected{% endif %}>Status</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="search" class="form-label fw-bold">Search</label>
+            <input type="text" class="form-control" id="search" placeholder="Search jobs..." value="{{ search_query or '' }}">
+        </div>
+
+        <div class="col-md-2 d-flex justify-content-start">
+    <button type="button" id="clearBtn" class="btn btn-secondary">Clear</button>
+        </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("search");
+    const statusSelect = document.getElementById("status");
+    const sortSelect = document.getElementById("sort");
+    const resultsDiv = document.getElementById("job-results");
+
+    let timeout = null;
+function updateResults() {
+  const params = new URLSearchParams({
+    search: searchInput.value,
+    status: statusSelect.value,
+    sort: sortSelect.value
+  });
+
+  fetch(`/search_jobs?${params.toString()}`)
+    .then(response => response.text())
+    .then(html => {
+      consol.log("Received HTML:",html);
+      resultsDiv.innerHTML = html;
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+    // Real-time search and filter updates
+    searchInput.addEventListener("input", function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(updateResults, 300); // wait 300ms
+    });
+    statusSelect.addEventListener("change", updateResults);
+    sortSelect.addEventListener("change", updateResults);
+});
+    document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("search");
+    const statusSelect = document.getElementById("status");
+    const sortSelect = document.getElementById("sort");
+    const resultsDiv = document.getElementById("job-results");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let timeout = null;
+
+    function updateResults() {
+        const params = new URLSearchParams({
+            search: searchInput.value,
+            status: statusSelect.value,
+            sort: sortSelect.value
+        });
+
+        fetch(`/search_jobs?${params.toString()}`)
+            .then(response => response.text())
+            .then(html => {
+                resultsDiv.innerHTML = html;
+            })
+            .catch(err => console.error("Error:", err));
+    }
+
+    // Real-time search and filter updates
+    searchInput.addEventListener("input", function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(updateResults, 300);
+    });
+    statusSelect.addEventListener("change", updateResults);
+    sortSelect.addEventListener("change", updateResults);
+
+    clearBtn.addEventListener("click", function() {
+        searchInput.value = "";
+        statusSelect.value = "";
+        sortSelect.value = "newest";
+        updateResults();
+    });
+});
+
+</script>
+    </form>
+
+    <!-- Job Cards -->
+    <div id="job-results" class="row g-3">
+        {% include "job_cards.html" %}
     </div>
 </div>
 {% endblock %}
