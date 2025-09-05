@@ -173,6 +173,15 @@ def delete_job(job_id):
     db.session.commit()
     flash("Job deleted!", "success")
     return redirect(url_for("main.dashboard"))
+@main.route("/job/<int:job_id>")
+@login_required
+def job_details(job_id):
+    job = Job.query.get_or_404(job_id)
+    if job.owner != current_user:
+        flash("You do not have permission to view this job.", "danger")
+        return redirect(url_for("main.dashboard"))
+    return render_template("job_details.html", job=job)
+
 
 @main.route('/')
 def home():

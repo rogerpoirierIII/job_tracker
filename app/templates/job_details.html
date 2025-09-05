@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Title: <strong>{{ job.title }}</strong> Company: <strong>{{ job.company }}</strong></h2>
+        <div>
+            <a href="{{ url_for('main.edit_job', job_id=job.id) }}" class="btn btn-outline-primary me-2">Edit</a>
+            <form method="POST" action="{{ url_for('main.delete_job', job_id=job.id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-outline-danger"
+                        onclick="return confirm('Are you sure you want to delete this job?');">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <!-- Status -->
+            <p>
+                <strong>Status:</strong>
+                {% if job.status == "Applied" %}
+                    <span class="badge bg-primary">Applied</span>
+                {% elif job.status == "Interview" %}
+                    <span class="badge bg-warning text-dark">Interview</span>
+                {% elif job.status == "Offer" %}
+                    <span class="badge bg-success">Offer</span>
+                {% elif job.status == "Rejected" %}
+                    <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ job.status }}</span>
+                {% endif %}
+            </p>
+
+            <!-- Notes -->
+            {% if job.notes %}
+                <p><strong>Notes:</strong> {{ job.notes }}</p>
+            {% endif %}
+
+            <!-- Dates -->
+            <p class="text-muted mb-0">
+                Created at: {{ job.created_at.strftime('%b %d, %Y %I:%M %p') }}<br>
+                Last updated: {{ job.updated_at.strftime('%b %d, %Y %I:%M %p') }}
+            </p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

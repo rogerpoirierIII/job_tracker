@@ -2,7 +2,11 @@
 <div class="col-md-6">
     <div class="card shadow-sm">
         <div class="card-body">
-            <h5 class="card-title">{{ job.title }}</h5>
+            <h5 class="card-title">
+                <a href="{{ url_for('main.job_details', job_id=job.id) }}" class="text-decoration-none">
+                {{ job.title }}
+                </a>
+            </h5>
             <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
 
             <!-- Status Badge -->
