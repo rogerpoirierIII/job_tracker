@@ -47,6 +47,18 @@
       {% endif %}
     {% endwith %}
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      setTimeout(() => {
+        alert.classList.remove('show');  // fade out
+        alert.classList.add('hide');
+      }, 4500); // 4.5 seconds
+    });
+  });
+</script>
+
 
     {% block content %}{% endblock %}
 </body>
