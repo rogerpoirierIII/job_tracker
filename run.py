@@ -1,11 +1,10 @@
 from app import create_app, db
-from app.models import User, Job
+from flask_migrate import upgrade
 
 app = create_app()
 
-# # Create database tables if they don't exist
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    upgrade()
 
 if __name__ == '__main__':
     app.run(debug=False)
