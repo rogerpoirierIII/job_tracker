@@ -8,7 +8,11 @@ login_manager.login_view =  'main.login' #Redirects page to login page is authen
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config.Config')
+
+    app.config['SECRET_KEY'] = 'supersecretkey'
+    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:Kaydeelyn1@localhost/jobtracker_db"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     db.init_app(app)
     login_manager.init_app(app)
 
