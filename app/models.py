@@ -9,6 +9,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(UserMixin,db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150),unique=True, nullable=False)
     email = db.Column(db.String(150),unique=True, nullable=False)
@@ -27,7 +28,7 @@ class Job(db.Model):
     company = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(50), default='Applied')
     notes = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now())
     website = db.Column(db.String(250), nullable=True)
