@@ -12,7 +12,7 @@ def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'supersecretkey'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:Kaydeelyn1@localhost/jobtracker_db"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://jobtracker_db_guzr_user:LXFT8RVF7ygeV5MMW3Odw4bhKD41ZuGW@dpg-d2v4fa3uibrs7387dsa0-a/jobtracker_db_guzr"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
