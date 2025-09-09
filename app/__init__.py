@@ -17,7 +17,7 @@ login_manager.login_view = 'main.login'  # Redirect to login if authentication f
 def create_app():
     app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "supersecretkey")
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-secret")
 
     # Build database URI from environment variables
     db_user = os.getenv("DB_USER", "postgres")
