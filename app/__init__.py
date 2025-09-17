@@ -21,7 +21,6 @@ def create_app():
 
     # Prefer a full DATABASE_URL if it exists
     database_url = os.getenv("DATABASE_URL")
-    print(">>> DATABASE_URL IN USE:", app.config["SQLALCHEMY_DATABASE_URI"])
     if database_url:
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     else:
@@ -35,6 +34,7 @@ def create_app():
             f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
         )
 
+    print(">>> DATABASE_URL IN USE:", app.config["SQLALCHEMY_DATABASE_URI"])
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
