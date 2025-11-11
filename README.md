@@ -8,7 +8,7 @@ Built to showcase end-to-end software engineering skills including database desi
 ## Live Demo
 
 **Deployed on Render:** [Application Tracker](https://job-tracker-idyl.onrender.com/) 
-
+## UPDATE: Due to issues with Render's limited trial period for databases, the deployment is no longer able to viewed live. Local deployment is still available. 
 
 
 
