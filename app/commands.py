@@ -1,3 +1,4 @@
+import click
 from flask import current_app
 from app import db
 from app.models import User, Job
@@ -9,7 +10,7 @@ def register_commands(app):
     def seed_demo():
         """Seed the database with a demo user and diverse sample job applications."""
         with app.app_context():
-            print("🌱 Starting demo data seeding...")
+            print("Starting demo data seeding...")
 
             # Check if demo user exists
             demo_user = User.query.filter_by(email="demo@jobtracker.com").first()
@@ -22,7 +23,7 @@ def register_commands(app):
                 )
                 db.session.add(demo_user)
                 db.session.commit()
-                print("Created demo user (demo@example.com / demo123)")
+                print("Created demo user (demo@jobtracker.com / password123)")
             else:
                 print("Demo user already exists.")
 
@@ -31,7 +32,7 @@ def register_commands(app):
                 {
                     "title": "Software Engineer",
                     "company": "Google",
-                    "status": "Interviewing",
+                    "status": "Interview",
                     "notes": "Completed phone screen. Next: onsite interviews next week.",
                     "website": "https://careers.google.com/",
                     "location": "Mountain View, CA",
@@ -51,7 +52,7 @@ def register_commands(app):
                 {
                     "title": "Data Analyst",
                     "company": "UnitedHealth Group",
-                    "status": "Offer Received",
+                    "status": "Offer",
                     "notes": "Offer accepted. Start date in December pending paperwork.",
                     "website": "https://careers.unitedhealthgroup.com/",
                     "location": "Minneapolis, MN",
@@ -61,7 +62,7 @@ def register_commands(app):
                 {
                     "title": "Frontend Engineer",
                     "company": "Figma",
-                    "status": "Interview Scheduled",
+                    "status": "Interview",
                     "notes": "Interview scheduled for next Monday with design lead.",
                     "website": "https://www.figma.com/careers/",
                     "location": "Remote",
@@ -81,7 +82,7 @@ def register_commands(app):
                 {
                     "title": "Machine Learning Engineer",
                     "company": "OpenAI",
-                    "status": "Researching",
+                    "status": "Rejected",
                     "notes": "Reading about current projects before applying.",
                     "website": "https://openai.com/careers",
                     "location": "San Francisco, CA",
@@ -101,7 +102,7 @@ def register_commands(app):
                 {
                     "title": "Quality Assurance Engineer",
                     "company": "Adobe",
-                    "status": "Interviewing",
+                    "status": "Interview",
                     "notes": "Passed technical test. Panel interview next week.",
                     "website": "https://adobe.wd5.myworkdayjobs.com/",
                     "location": "San Jose, CA",
@@ -111,7 +112,7 @@ def register_commands(app):
                 {
                     "title": "Full Stack Developer",
                     "company": "Notion Labs",
-                    "status": "Coding Challenge",
+                    "status": "Interview",
                     "notes": "Submitted take-home assignment. Awaiting feedback.",
                     "website": "https://www.notion.so/careers",
                     "location": "Remote",
@@ -121,7 +122,7 @@ def register_commands(app):
                 {
                     "title": "Business Intelligence Analyst",
                     "company": "Meta",
-                    "status": "Applied",
+                    "status": "Rejected",
                     "notes": "Applied via internal referral. Recruiter said review in progress.",
                     "website": "https://www.metacareers.com/",
                     "location": "Menlo Park, CA",
@@ -141,7 +142,7 @@ def register_commands(app):
                 {
                     "title": "Technical Writer",
                     "company": "Atlassian",
-                    "status": "Offer Declined",
+                    "status": "Offer",
                     "notes": "Declined offer due to compensation mismatch.",
                     "website": "https://www.atlassian.com/company/careers",
                     "location": "Remote",
@@ -164,3 +165,16 @@ def register_commands(app):
 
             db.session.commit()
             print("Demo data seeded")
+    @app.cli.command("delete_demo")
+    def delete_demo():
+        """Delete the demo user and all their associated jobs."""
+        click.echo("Deleting demo data...")
+
+        demo_email = "demo@jobtracker.com"
+
+        demo_user = User.query.filter_by(email=demo_email).first()
+        if demo_user:
+            Job.query.filter_by(user_id=demo_user.id).delete()
+            db.session.delete(demo_user)
+            db.session.commit()
+            click.echo("Demo data deleted.")
