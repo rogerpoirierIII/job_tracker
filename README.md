@@ -44,7 +44,7 @@ Built to showcase end-to-end software engineering skills including database desi
 
 ---
 
-## ⚙️ Local Development Setup
+## Local Development Setup
 
 1. **Clone the repository**  
    ```bash
@@ -70,7 +70,14 @@ Built to showcase end-to-end software engineering skills including database desi
 5. **Initialize and migrate the database**
    ```bash
    flask db upgrade
-6. **Run the app**
+6. **Seed demo data**
+   ```bash
+   flask seed_demo
+8. **Run the app**
    ```bash
    flask run
-Visit http://127.0.0.1:5000 in your browser.
+9. **Visit http://127.0.0.1:5000 in your browser**
+10. **Login to demo account**
+    ```makefile
+    Email: demo@jobtracker.com
+    Password: password123
